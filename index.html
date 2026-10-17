@@ -3,33 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Menu</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Food Ordering</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #fff8f0;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    table {
+        width: 90%;
+        margin: auto;
+        border-collapse: collapse;
+        background-color: white;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 15px;
+        text-align: center;
+    }
+    th {
+        background-color: #f4f4f4;
+    }
+    .food-img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    input[type="number"] {
+        width: 60px;
+        padding: 5px;
+    }
+    textarea {
+        width: 90%;
+        height: 100px;
+        margin: 10px auto;
+        display: block;
+        padding: 10px;
+        font-size: 16px;
+    }
+    button {
+        padding: 12px 25px;
+        font-size: 18px;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+    }
+    .chosen-button {
+        background-color: blue;
+        color: white;
+        display: block;
+        margin: 20px auto;
+    }
+    .send-button {
+        background-color: green;
+        color: white;
+    }
+    .title {
+        background-color: blue;
+        color: yellow;
+        padding: 10px;
+        text-align: center;
+    }
+    .form-container {
+        text-align: center;
+        margin-top: 30px;
+    }
+</style>
 </head>
-
 <body>
-
-    <h1>🍽️ Food Menu</h1>
-
-    <div class="menu">
-
-        <div class="food">
-            <img src="images/chicken-rice.jpg" alt="Chicken Rice">
-            <h2>Chicken Rice</h2>
-        </div>
-
-        <div class="food">
-            <img src="images/chicken-basil.jpg" alt="Chicken Basil with Fried Egg">
-            <h2>Chicken Basil with Fried Egg</h2>
-        </div>
-
-        <div class="food">
-            <img src="images/tom-yum.jpg" alt="Tom Yum">
-            <h2>Tom Yum</h2>
-        </div>
-
-    </div>
-
+<h1>🍽️ Food Ordering</h1>
+<form id="myForm">
+    <table>
+        <thead>
+            <tr>
+                <th>Food</th>
+                <th>Choose</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Chicken Rice -->
+            <tr>
+                <td>
+                    <img
+                        src="images/chicken-rice.jpg"
+                        class="food-img"
+                        alt="Chicken Rice">
+                    <br><br>
+                    <strong>Chicken Rice</strong>
+                </td>
+                <td>
+                    <input
+                        type="checkbox"
+                        name="food"
+                        value="Chicken Rice">
+                </td>
+                <td>
+                    <input
+                        type="number"
+                        name="quantity_chicken_rice"
+                        min="1"
+                        value="1">
+                </td>
+            </tr>
+            <!-- Tom Yum -->
+            <tr>
+                <td>
+                    <img
+                        src="images/tom-yum.jpg"
+                        class="food-img"
+                        alt="Tom Yum">
+                    <br><br>
+                    <strong>Tom Yum</strong>
+                </td>
+                <td>
+                    <input
+                        type="checkbox"
+                        name="food"
+                        value="Tom Yum">
+                </td>
+                <td>
+                    <input
+                        type="number"
+                        name="quantity_tom_yum"
+                        min="1"
+                        value="1">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button
+        type="button"
+        onclick="saveToMessage()"
+        class="chosen-button">
+        Chosen Menu
+    </button>
+    <h2 class="title">Chosen Menu Item</h2>
+    <textarea
+        id="outputMessage"
+        readonly
+        placeholder="Your selected food will appear here...">
+    </textarea>
+    <label for="address">
+        <strong>Delivery Address</strong>
+    </label>
+    <textarea
+        id="address"
+        name="address"
+        placeholder="Enter your delivery address"
+        required>
+    </textarea>
+    <textarea
+        id="orderAndaddress"
+        name="orderAndaddress"
+        hidden>
+    </textarea>
+</form>
+<!-- Formspree -->
+<div class="form-container">
+    <h2 class="title">Send Order to Email</h2>
+    <form
+        action="https://formspree.io/f/mrpgnvyv"
+        method="POST">
+        <label for="order">
+            Your Order:
+        </label>
+        <textarea
+            id="order"
+            name="order"
+            placeholder="Waiting for your order..."
+            required>
+        </textarea>
+        <button
+            type="submit"
+            class="send-button">
+            Send Order to Email
+        </button>
+    </form>
+</div>
+<script>
+    function saveToMessage() {
+        const form = document.getElementById("myForm");
+        const checkboxes =
+            form.querySelectorAll('input[type="checkbox"]');
+        let message = "Selected Items:\n\n";
+        let selected = false;
+        checkboxes.forEach(function(chk) {
+            if (chk.checked) {
+                selected = true;
+                const parent =
+                    chk.closest("tr");
+                const quantity =
+                    parent.querySelector(
+                        'input[type="number"]'
+                    ).value;
+                message +=
+                    "- " +
+                    chk.value +
+                    " x " +
+                    quantity +
+                    "\n";
+            }
+        });
+        if (!selected) {
+            alert("Please select a food menu.");
+            return;
+        }
+        document.getElementById(
+            "outputMessage"
+        ).value = message;
+        const address =
+            document.getElementById(
+                "address"
+            ).value;
+        const combined =
+            message +
+            "\nDelivery Address:\n" +
+            address;
+        document.getElementById(
+            "orderAndaddress"
+        ).value = combined;
+        document.getElementById(
+            "order"
+        ).value = combined;
+    }
+</script>
 </body>
 </html>
  
